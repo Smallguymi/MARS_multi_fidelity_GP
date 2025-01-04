@@ -65,14 +65,16 @@ import re
 # 设置目录路径
 directory_path = r'F:\MARS_surrogate_model'
 
-# 初始化一个空列表来存储提取的值
-values = []
+# 初始化一个空列表来存储提取的值，initialize  a new path list storing the path of the scanning files
+train_x=[]
+s_path_list = []
 
 # 编译正则表达式以匹配文件夹名称
 pattern = re.compile(r'NPSI_(\d+)_NCHI_(\d+)')
 
 # 遍历目录下的所有文件夹
 for folder_name in os.listdir(directory_path):
+    folder_path = os.path.join(directory_path, folder_name)
     # 检查是否为文件夹
     if os.path.isdir(os.path.join(directory_path, folder_name)):
         # 使用正则表达式匹配文件夹名称
@@ -81,11 +83,22 @@ for folder_name in os.listdir(directory_path):
             # 如果匹配成功，提取*的值
             npsi_value, nchi_value = match.groups()
             # 将提取的值添加到列表中
-            values.append((npsi_value, nchi_value))
+            train_x.append((npsi_value, nchi_value))
+
+            # 扫描匹配成功后的路径下所有的文件夹名字
+            for sub_folder_name in os.listdir(folder_path):
+                sub_folder_path = os.path.join(folder_path, sub_folder_name)
+                # 检查是否为文件夹
+                if os.path.isdir(sub_folder_path):
+                    # 将子文件夹路径保存到s_path_list中
+                    s_path_list.append(sub_folder_path)
+            
 
 # 打印结果
 print(values)
-
+print("Sub-folder paths under matched folders:")
+for s_path in s_path_list:
+    print(s_path)
 
 def inputdata(s_path):
     # 构造文件路径
@@ -100,7 +113,7 @@ def inputdata(s_path):
     NN = []
     
     # 查找特定关键词的索引
-    keywords = ['CFBAL', 'CSSPEC', 'QSPEC', 'ETA', 'TALPHA1_REAL', 'TALPHA2_IMAG']
+    keywords = ['CFBAL']
     for keyword in keywords:
         try:
             # 找到关键词的索引并添加到NN列表中
@@ -113,10 +126,10 @@ def inputdata(s_path):
     return data1, NN
 
 # 使用示例
-# s_path = 'your_path_here'  # 替换为你的路径
-# data1, NN = inputdata(s_path)
-# print("Data:", data1)
-# print("Indices:", NN)
+s_path = 'F:/MARS_surrogate_model/NPSI_250_NCHI_120/20250104_1' 
+data1, NN = inputdata(s_path)
+print("Data:", data1)
+print("Indices:", NN)
 
 
 
